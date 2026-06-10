@@ -5,8 +5,9 @@ The benchmark uses seeded pilot-style notes with clear action phrasing, ambiguou
 | Metric | Result |
 | --- | ---: |
 | Notes processed | 1,427 |
-| Candidate suggestions | 381 |
+| Candidate suggestions | 421 |
 | Accepted tasks | 320 |
+| Suggestion acceptance rate | 76% |
 | Median suggestions per note | 0 |
 | Notes requiring reviewer edits | 28% |
 
@@ -15,4 +16,3 @@ The benchmark uses seeded pilot-style notes with clear action phrasing, ambiguou
 - Owner detection should be conservative.
 - Due dates are better treated as editable labels unless a date is explicit.
 - The source excerpt is the strongest trust signal during review.
-

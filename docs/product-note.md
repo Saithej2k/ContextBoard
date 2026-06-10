@@ -6,7 +6,8 @@ ContextBoard was designed for teams whose meeting notes contain useful follow-up
 
 - 11 beta users across product, design, engineering, and operations
 - 1.4K+ notes captured during an 8-week pilot
-- 320+ accepted tasks after review
+- 421 candidate suggestions reviewed, with 320 accepted into tracked tasks
+- 76% suggestion-acceptance rate during the beta
 - Most edited fields: owner, due date, and action title
 
 ## UX Trade-Offs
@@ -16,4 +17,3 @@ The core trade-off is speed versus trust. ContextBoard favors a review step beca
 ## Reviewer Verification
 
 The repository includes the schema, task suggestion service, seeded pilot data, and benchmark notes used to validate the workflow. The live demo runs with the same interaction model as the API-backed version.
-

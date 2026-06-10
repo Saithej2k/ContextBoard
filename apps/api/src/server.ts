@@ -2,7 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import { createRepository } from "./db.js";
+import { createRepository, databaseConnectionString } from "./db.js";
 import { contextBoardRoutes } from "./routes.js";
 
 const app = express();
@@ -17,11 +17,11 @@ app.get("/api/health", (_request, response) => {
   response.json({
     ok: true,
     service: "contextboard-api",
-    storage: process.env.DATABASE_URL ? "postgres" : "memory"
+    storage: databaseConnectionString() ? "postgres" : "memory"
   });
 });
 
-app.use("/api", contextBoardRoutes(createRepository()));
+app.use("/api", contextBoardRoutes(await createRepository()));
 
 app.listen(port, () => {
   console.log(`ContextBoard API listening on ${port}`);

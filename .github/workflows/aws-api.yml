@@ -1,0 +1,85 @@
+name: Deploy AWS API
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  STACK_NAME: contextboard-api
+  ECR_REPOSITORY: contextboard-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+      - name: Resolve AWS account
+        id: account
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          echo "account_id=$account_id" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure ECR repository
+        run: |
+          aws ecr describe-repositories --repository-names "$ECR_REPOSITORY" >/dev/null 2>&1 || \
+            aws ecr create-repository --repository-name "$ECR_REPOSITORY" >/dev/null
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region "$AWS_REGION" | \
+            docker login --username AWS --password-stdin "${{ steps.account.outputs.account_id }}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+      - name: Build and push API image
+        id: image
+        run: |
+          image_uri="${{ steps.account.outputs.account_id }}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${GITHUB_SHA}"
+          docker build -f apps/api/Dockerfile -t "$image_uri" .
+          docker push "$image_uri"
+          echo "image_uri=$image_uri" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy CloudFormation stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/aws/api-rds.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              ProjectName=contextboard \
+              ImageUri="${{ steps.image.outputs.image_uri }}" \
+              CorsOrigin="${{ vars.CORS_ORIGIN || 'https://saithej2k.github.io' }}"
+
+      - name: Capture API URL
+        id: api
+        run: |
+          api_url="$(aws cloudformation describe-stacks \
+            --stack-name "$STACK_NAME" \
+            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+            --output text)"
+          echo "api_url=$api_url" >> "$GITHUB_OUTPUT"
+          echo "API URL: $api_url"
+
+      - name: Update Pages API variable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh variable set VITE_API_URL --repo "$GITHUB_REPOSITORY" --body "${{ steps.api.outputs.api_url }}/api"
+
+      - name: Rebuild GitHub Pages demo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+

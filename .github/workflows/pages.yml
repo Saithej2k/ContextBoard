@@ -32,6 +32,8 @@ jobs:
         run: npm ci
 
       - name: Build web
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build -w packages/shared && npm run build -w apps/web
 
       - name: Upload artifact

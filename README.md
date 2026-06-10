@@ -7,6 +7,7 @@ Collaborative notes and action review workspace for teams that need traceable fo
 | Demo | https://saithej2k.github.io/ContextBoard/ |
 | Repo | https://github.com/Saithej2k/ContextBoard |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
+| AWS deployment | [docs/aws-deployment.md](docs/aws-deployment.md) |
 | Product note | [docs/product-note.md](docs/product-note.md) |
 
 ## What It Does
@@ -63,4 +64,4 @@ npm run test
 
 ## Deployment
 
-The public demo deploys through GitHub Pages from `.github/workflows/pages.yml`. Hosted API deployment needs a Node runtime and `DATABASE_URL`; the API container in `apps/api/Dockerfile` is ready for services such as Render, Fly.io, Railway, or a private container host.
+The public demo deploys through GitHub Pages from `.github/workflows/pages.yml`. The AWS API deployment path is in `.github/workflows/aws-api.yml` and `infra/aws/api-rds.yml`; it builds the Docker image, deploys ECS Fargate plus RDS PostgreSQL, then points the Pages build at the hosted API.

@@ -20,7 +20,7 @@ Task suggestions are stored separately from accepted tasks. Reviewers can edit t
 
 ## Deployment Model
 
-The public demo is deployed as a static GitHub Pages build with seeded data. The API and PostgreSQL pieces are ready for hosted deployment on a Node-compatible service with `DATABASE_URL` configured.
+The public demo is deployed through GitHub Pages. The AWS deployment path builds the API Docker image in GitHub Actions, pushes it to ECR, deploys ECS Fargate behind an Application Load Balancer, and provisions PostgreSQL on Amazon RDS. Once the workflow writes `VITE_API_URL`, the Pages build points at the hosted API instead of browser-local demo state.
 
 ## Data Model
 

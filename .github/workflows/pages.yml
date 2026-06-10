@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Build web
-        run: npm run build -w apps/web
+        run: npm run build -w packages/shared && npm run build -w apps/web
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -50,4 +50,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

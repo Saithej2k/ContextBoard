@@ -22,3 +22,11 @@ Task suggestions are stored separately from accepted tasks. Reviewers can edit t
 
 The public demo is deployed as a static GitHub Pages build with seeded data. The API and PostgreSQL pieces are ready for hosted deployment on a Node-compatible service with `DATABASE_URL` configured.
 
+## Data Model
+
+- `notes` store the original shared text and tags.
+- `task_suggestions` store reviewable candidates with confidence, rationale, status, and source excerpt.
+- `tasks` store accepted work items and retain optional links back to suggestions and notes.
+- `workspace_users` keep assignment metadata separate from notes and tasks.
+
+This keeps dismissed suggestions auditable without polluting the active task board.

@@ -11,7 +11,6 @@ import {
   type WorkspaceSnapshot,
   buildDemoDigest,
   createDemoSnapshot,
-  demoUsers,
   extractTaskSuggestions,
   pilotMetrics,
   taskSchema,

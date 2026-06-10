@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: contextboard
+      POSTGRES_PASSWORD: contextboard
+      POSTGRES_DB: contextboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - contextboard-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U contextboard -d contextboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 8
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgres://contextboard:contextboard@postgres:5432/contextboard
+      PORT: 4100
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "4100:4100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  contextboard-postgres:
+

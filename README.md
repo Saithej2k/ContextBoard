@@ -32,7 +32,15 @@ npm run dev
 
 The web app runs on `http://localhost:5173` and the API runs on `http://localhost:4100`.
 
-To run against PostgreSQL, create a local database and apply the migration in `apps/api/db/001_initial.sql`, or use the connection string in `.env.example`.
+To run against PostgreSQL:
+
+```bash
+createdb contextboard
+psql "$DATABASE_URL" -f apps/api/db/001_initial.sql
+npm run seed -w apps/api
+```
+
+Without `DATABASE_URL`, the API serves the seeded demo workspace from memory. The GitHub Pages demo uses the same seeded data in browser storage.
 
 ## Scripts
 
@@ -43,3 +51,16 @@ npm run lint
 npm run test
 ```
 
+## API Surface
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Service and storage health |
+| `GET` | `/api/workspaces/:workspaceId` | Full workspace snapshot |
+| `POST` | `/api/workspaces/:workspaceId/notes` | Create a note and queue task suggestions |
+| `POST` | `/api/workspaces/:workspaceId/suggestions/:suggestionId/review` | Accept or dismiss a suggestion |
+| `PATCH` | `/api/workspaces/:workspaceId/tasks/:taskId` | Update task owner, priority, due label, or status |
+
+## Deployment
+
+The public demo deploys through GitHub Pages from `.github/workflows/pages.yml`. Hosted API deployment needs a Node runtime and `DATABASE_URL`; the API container in `apps/api/Dockerfile` is ready for services such as Render, Fly.io, Railway, or a private container host.
